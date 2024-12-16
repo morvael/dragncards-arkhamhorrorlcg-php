@@ -81,7 +81,7 @@ if ($fileName) {
         if ($id == '09021') {
             $fileToLoad = '09021a.webp';
         } else if ($id == '09022') {
-            $fileToLoad = $taboo >= 7 ? 't09022a.webp' : '09022a.webp';
+            $fileToLoad = $taboo >= 6 ? 't09022a.webp' : '09022a.webp';
         } else if ($id == '09023') {
             $fileToLoad = '09023a.webp';
         } else if ($id == '09040') {
@@ -101,7 +101,7 @@ if ($fileName) {
         } else if ($id == '09080') {
             $fileToLoad = '09080a.webp';
         } else if ($id == '09081') {
-            $fileToLoad = $taboo >= 7 ? 't09081a.webp' : '09081a.webp';
+            $fileToLoad = $taboo >= 6 ? 't09081a.webp' : '09081a.webp';
         } else if ($id == '09099') {
             $fileToLoad = '09099a.webp';
         } else if ($id == '09100') {

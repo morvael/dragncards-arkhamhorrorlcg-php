@@ -339,7 +339,7 @@ if ($id !== null && $taboo !== null) {
                 squares($image, $black, $upgrade5, 4, 65, 857, 84, 16, 16);
                 squares($image, $black, $upgrade6, 4, 65, 924, 84, 16, 16);
             }
-            header('Cache-Control: max-age=604800');
+            header('Cache-Control: max-age=2592000');
             header('Content-Type: image/webp');
             header('Content-Disposition: inline; filename="' . $id . '-' . $taboo . '-' . $data . '.webp"');
             imagewebp($image);
@@ -351,8 +351,8 @@ if ($id !== null && $taboo !== null) {
     }
 }
 $image = imagecreatefromwebp('./upgrade.webp');
-header('Cache-Control: max-age=604800');
+header('Cache-Control: max-age=2592000');
 header('Content-Type: image/webp');
-header('Content-Disposition: inline; filename=upgrade.webp');
+header('Content-Disposition: inline; filename="' . $id . '-' . $taboo . '-' . $data . '.webp"'); //to enable caching of wrong images, mod_rewrite should keep this safe, script will not be called for nonmatching params
 imagewebp($image);
 imagedestroy($image);

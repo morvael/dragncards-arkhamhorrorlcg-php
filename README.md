@@ -14,6 +14,12 @@ Sample request formats:
 First element is card id, second is taboo id. Then there's Base64 encoded (URL
 safe, no padding) customization info in the same format as in the deck JSON.
 
+#### Dictionaries
+
+Card ids, traits, skills appearing in customization data are validated in
+data files before displaying. If some trait or card name isn't displaying - open
+an issue so it can be added to the data file.
+
 #### Rewriting requests
 
 Plain file requests are redirected to the `image.php` script using the following

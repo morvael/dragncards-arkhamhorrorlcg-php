@@ -6,26 +6,13 @@ This script generates filled customizable card upgrade cards.
 
 Sample request formats:
 
-1. `09021_0_1_2_2_2_2_3_3_0_0.webp`
-2. `09042_0_0|04311_1_1_2_2|04311|04311_2_3_4_0.webp`
-3. `09060_0_0|HistoricalSociety_2_2|HistoricalSociety_2_2_2_3_3_0.webp`
-4. `09079_0_0|willpower_1_1_2_2|intellect_3|agility_3_3_0.webp`
+1. `09021-0-MHwxLDF8MiwyfDIsM3wyLDR8Miw1fDMsNnwz.webp`
+2. `09042-0-MHwwfDAxMDYxLDF8MSwyfDEsM3wyLDR8MnwwNDAyOV4wMTA2MCw1fDIsNnwzLDd8NA.webp`
+3. `09060-0-MHwwfElsbGljaXQsMXwxLDJ8MnxUcmljaywzfDIsNHwyLDV8Miw2fDMsN3wz.webp`
+4. `09079-0-MHwwfHdpbGxwb3dlciwxfDEsMnwxLDN8Miw0fDJ8aW50ZWxsZWN0LDV8M3xhZ2lsaXR5LDZ8Myw3fDM.webp`
 
-First element is card id, second is taboo id. Then there's 9 sections with
-number of filled pips followed by any extra values.
-
-#### Trait and card names
-
-Despite allowing quite a lot of characters inside the `[^_\|\.]` section
-(required to match non-ASCII characters) all trait and card values are mapped
-via dictionaries, and if not present there - they won't be rendered. To ease the
-problems with URL/Unicode encoding the following changes should be made to trait
-names:
-
-1. Spaces, `-`, and `'` must be removed.
-1. `?` must be replaced with `Q`.
-
-For example: trait name `A b-c'd?` must be represented as `AbcdQ`.
+First element is card id, second is taboo id. Then there's Base64 encoded (URL
+safe, no padding) customization info in the same format as in the deck JSON.
 
 #### Rewriting requests
 
@@ -37,7 +24,7 @@ AddDefaultCharset UTF-8
 RewriteEngine On
 RewriteRule ^/favicon\.ico$ favicon.ico [NC,L]
 RewriteRule ^/robots\.txt$ robots.txt [NC,L]
-RewriteRule ^/(t?[0-9]+(a-z)?_[0-9]+(_[0-9](\|[^_\|\.]*)*)*\.webp)$ image.php?file=$1 [NC,L]
+RewriteRule ^/([0-9]{4,12}[a-z]?)-([0-9]{1,3})-([A-Za-z0-9-_]{0,1024})\.webp$ image.php?id=$1&taboo=$2&data=$3 [NC,L]
 RewriteRule ^.*$ - [R=404,L]
 ```
 

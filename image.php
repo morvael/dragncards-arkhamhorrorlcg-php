@@ -10,8 +10,16 @@ function get_upgrade($items, $index) {
     }
 }
 
-function load_map($fileName) {
+function load_map($fileName, $dictionaries) {
     $result = array();
+    if ($dictionaries !== null) {
+        $dicts = json_decode(base64_decode(strtr($dictionaries, '-_', '+/'), false), true, 10, JSON_INVALID_UTF8_SUBSTITUTE | JSON_OBJECT_AS_ARRAY);
+        if (array_key_exists('names', $dicts)) {
+            foreach ($dicts['names'] as $id => $name) {
+                $result[$id] = $name;
+            }
+        }
+    }
     $data = file($fileName);
     foreach ($data as $i => $line) {
         $item = explode("\t", $line);
@@ -68,9 +76,16 @@ function text($image, $fontName, $fontSize, $color, $upgrade, $max, $x, $y, $ind
     }
 }
 
+function textDirect($image, $fontName, $fontSize, $color, $upgrade, $max, $x, $y, $index) {
+    if ($upgrade[0] >= $max && array_key_exists($index, $upgrade)) {
+        imagefttext($image, $fontSize, 0, $x, $y, $color, $fontName, $upgrade[$index]);
+    }
+}
+
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_REGEXP, array('options' => array('regexp' => '/^[0-9]{4,12}[a-z]?$/', 'flags' => FILTER_NULL_ON_FAILURE)));
 $taboo = filter_input(INPUT_GET, 'taboo', FILTER_VALIDATE_REGEXP, array('options' => array('regexp' => '/^[0-9]{1,3}$/', 'flags' => FILTER_NULL_ON_FAILURE)));
 $data = filter_input(INPUT_GET, 'data', FILTER_VALIDATE_REGEXP, array('options' => array('regexp' => '/^[A-Za-z0-9-_]{0,1024}$/', 'flags' => FILTER_NULL_ON_FAILURE)));
+$dictionaries = filter_input(INPUT_GET, 'dictionaries', FILTER_VALIDATE_REGEXP, array('options' => array('regexp' => '/^[A-Za-z0-9-_]{0,2048}$/', 'flags' => FILTER_NULL_ON_FAILURE)));
 if ($id !== null && $taboo !== null) {
     try {
         $fileToLoad = 'upgrade.webp';
@@ -203,6 +218,9 @@ if ($id !== null && $taboo !== null) {
             } else if ($fileToLoad == '09042a.webp') {
                 //paint The Raven Quill https://ahlcg.derwinski.pl/09042-0-MHwwfDAxMDYxLDF8MSwyfDEsM3wyLDR8MnwwNDAyOV4wMTA2MCw1fDIsNnwzLDd8NA.webp
                 //"cus_09042":"0|0|01061,1|1,2|1,3|2,4|2|04029^01060,5|2,6|3,7|4"
+                //with custom card name mapping https://ahlcg.derwinski.pl/09042-0-MHwwfGlkMSwxfDEsMnwxLDN8Miw0fDJ8aWQyXmlkMyw1fDIsNnwzLDd8NA-eyJuYW1lcyI6eyJpZDEiOiJDYXJkIEEiLCJpZDIiOiJDYXJkIEIiLCJpZDMiOiJDYXJkIEMifX0.webp
+                //0|0|id1,1|1,2|1,3|2,4|2|id2^id3,5|2,6|3,7|4
+                //{"names":{"id1":"Card A","id2":"Card B","id3":"Card C"}}
                 squares($image, $black, $upgrade1, 1, 66, 272, 16, 16, 16);
                 squares($image, $black, $upgrade2, 1, 66, 342, 16, 16, 16);
                 squares($image, $black, $upgrade3, 2, 66, 412, 39, 16, 16);
@@ -210,7 +228,7 @@ if ($id !== null && $taboo !== null) {
                 squares($image, $black, $upgrade5, 2, 66, 552, 39, 16, 16);
                 squares($image, $black, $upgrade6, 3, 66, 653, 62, 16, 16);
                 squares($image, $black, $upgrade7, 4, 66, 755, 84, 16, 16);
-                $names = load_map('raven_quill.tsv');
+                $names = load_map('raven_quill.tsv', $dictionaries);
                 text($image, './Arkhamic_v2.1.ttf', 23, $black, $upgrade0, 0, 400, 226, 1, $names);
                 text($image, './Arkhamic_v2.1.ttf', 23, $black, $upgrade4, 2, 144, 529, 1, $names);
                 text($image, './Arkhamic_v2.1.ttf', 23, $black, $upgrade4, 2, 417, 529, 2, $names);
@@ -226,6 +244,8 @@ if ($id !== null && $taboo !== null) {
             } else if ($fileToLoad == '09060a.webp') {
                 //paint Friends in Low Places https://ahlcg.derwinski.pl/09060-0-MHwwfElsbGljaXQsMXwxLDJ8MnxUcmljaywzfDIsNHwyLDV8Miw2fDMsN3wz.webp
                 //"cus_09060":"0|0|Illicit,1|1,2|2|Trick,3|2,4|2,5|2,6|3,7|3"
+                //with custom trait names https://ahlcg.derwinski.pl/09060-0-MHwwfFRyYWl0IEEsMXwxLDJ8MnxUcmFpdCBCLDN8Miw0fDIsNXwyLDZ8Myw3fDM.webp
+                //0|0|Trait A,1|1,2|2|Trait B,3|2,4|2,5|2,6|3,7|3
                 squares($image, $black, $upgrade1, 1, 65, 267, 16, 16, 16);
                 squares($image, $black, $upgrade2, 2, 65, 368, 39, 16, 16);
                 squares($image, $black, $upgrade3, 2, 65, 501, 39, 16, 16);
@@ -233,9 +253,8 @@ if ($id !== null && $taboo !== null) {
                 squares($image, $black, $upgrade5, 2, 65, 703, 39, 16, 16);
                 squares($image, $black, $upgrade6, 3, 65, 773, 61, 16, 16);
                 squares($image, $black, $upgrade7, 3, 65, 843, 61, 16, 16);
-                $names = load_set('traits.tsv');
-                text($image, './arnopro6.otf', 20, $black, $upgrade0, 0, 239, 219, 1, $names);
-                text($image, './arnopro6.otf', 20, $black, $upgrade2, 2, 494, 382, 1, $names);
+                textDirect($image, './arnopro6.otf', 20, $black, $upgrade0, 0, 239, 219, 1);
+                textDirect($image, './arnopro6.otf', 20, $black, $upgrade2, 2, 494, 382, 1);
             } else if ($fileToLoad == '09061a.webp') {
                 //paint Honed Instinct https://ahlcg.derwinski.pl/09061-0-MHwxLDF8MSwyfDEsM3wxLDR8MSw1fDIsNnwzLDd8NQ.webp
                 //"cus_09061":"0|1,1|1,2|1,3|1,4|1,5|2,6|3,7|5"
@@ -323,11 +342,10 @@ if ($id !== null && $taboo !== null) {
                 squares($image, $black, $upgrade3, 3, 65, 447, 70, 18, 18);
                 squares($image, $black, $upgrade4, 4, 65, 639, 96, 18, 18);
                 squares($image, $black, $upgrade5, 5, 65, 795, 122, 18, 18);
-                $names = load_set('traits.tsv');
-                text($image, './arnopro6.otf', 20, $black, $upgrade0, 0, 265, 226, 1, $names);
-                text($image, './arnopro6.otf', 20, $black, $upgrade0, 0, 479, 226, 2, $names);
-                text($image, './arnopro6.otf', 20, $black, $upgrade1, 1, 61, 327, 1, $names);
-                text($image, './arnopro6.otf', 20, $black, $upgrade2, 2, 61, 413, 1, $names);
+                textDirect($image, './arnopro6.otf', 20, $black, $upgrade0, 0, 265, 226, 1);
+                textDirect($image, './arnopro6.otf', 20, $black, $upgrade0, 0, 479, 226, 2);
+                textDirect($image, './arnopro6.otf', 20, $black, $upgrade1, 1, 61, 327, 1);
+                textDirect($image, './arnopro6.otf', 20, $black, $upgrade2, 2, 61, 413, 1);
             } else if ($fileToLoad == '09119a.webp') {
                 //paint Hyperphysical Shotcaster: Theoretical Device https://ahlcg.derwinski.pl/09119-0-MHwyLDF8MiwyfDIsM3wyLDR8Miw1fDQsNnw0.webp
                 //"cus_09119":"0|2,1|2,2|2,3|2,4|2,5|4,6|4",

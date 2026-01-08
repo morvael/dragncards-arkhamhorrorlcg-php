@@ -36,6 +36,16 @@ Sample request format with extra parameter:
 
 1. `09042-0-MHwwfGlkMSwxfDEsMnwxLDN8Miw0fDJ8aWQyXmlkMyw1fDIsNnwzLDd8NA-eyJuYW1lcyI6eyJpZDEiOiJDYXJkIEEiLCJpZDIiOiJDYXJkIEIiLCJpZDMiOiJDYXJkIEMifX0.webp`
 
+#### Languages
+
+Language id (supported values: EN, IT) can be provided via first optional
+element preceeding id (defaults to EN, also for unsupported language ids).
+
+Sample request format with extra parameter:
+
+1. `EN-09021-0-MHwxLDF8MiwyfDIsM3wyLDR8Miw1fDMsNnwz.webp`
+2. `IT-09021-0-MHwxLDF8MiwyfDIsM3wyLDR8Miw1fDMsNnwz.webp`
+
 #### Rewriting requests
 
 Plain file requests are redirected to the `image.php` script using the following
@@ -46,8 +56,10 @@ AddDefaultCharset UTF-8
 RewriteEngine On
 RewriteRule ^/favicon\.ico$ favicon.ico [NC,L]
 RewriteRule ^/robots\.txt$ robots.txt [NC,L]
-RewriteRule ^/([0-9]{4,12}[a-z]?)-([0-9]{1,3})-([A-Za-z0-9-_]{0,1024})-([A-Za-z0-9-_]{0,2048})\.webp$ image.php?id=$1&taboo=$2&data=$3&dictionaries=$4 [NC,L]
-RewriteRule ^/([0-9]{4,12}[a-z]?)-([0-9]{1,3})-([A-Za-z0-9-_]{0,1024})\.webp$ image.php?id=$1&taboo=$2&data=$3 [NC,L]
+RewriteRule ^/([A-Z]{2,2})-([0-9]{4,12}[a-z]?)-([0-9]{1,3})-([A-Za-z0-9-_]{0,1024})-([A-Za-z0-9-_]{0,2048})\.webp$ image.php?lang=$1&id=$2&taboo=$3&data=$4&dictionaries=$5 [NC,L]
+RewriteRule ^/([A-Z]{2,2})-([0-9]{4,12}[a-z]?)-([0-9]{1,3})-([A-Za-z0-9-_]{0,1024})\.webp$ image.php?lang=$1&id=$2&taboo=$3&data=$4 [NC,L]
+RewriteRule ^/([0-9]{4,12}[a-z]?)-([0-9]{1,3})-([A-Za-z0-9-_]{0,1024})-([A-Za-z0-9-_]{0,2048})\.webp$ image.php?lang=EN&id=$1&taboo=$2&data=$3&dictionaries=$4 [NC,L]
+RewriteRule ^/([0-9]{4,12}[a-z]?)-([0-9]{1,3})-([A-Za-z0-9-_]{0,1024})\.webp$ image.php?lang=EN&id=$1&taboo=$2&data=$3 [NC,L]
 RewriteRule ^.*$ - [R=404,L]
 ```
 

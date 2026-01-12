@@ -10,12 +10,12 @@ function get_upgrade($items, $index) {
     }
 }
 
-function load_map($fileName, $dictionaries) {
+function load_map($fileName, $dictionaries, $dictionary) {
     $result = array();
     if ($dictionaries !== null) {
         $dicts = json_decode(base64_decode(strtr($dictionaries, '-_', '+/'), false), true, 10, JSON_INVALID_UTF8_SUBSTITUTE | JSON_OBJECT_AS_ARRAY);
-        if (array_key_exists('names', $dicts)) {
-            foreach ($dicts['names'] as $id => $name) {
+        if (array_key_exists($dictionary, $dicts)) {
+            foreach ($dicts[$dictionary] as $id => $name) {
                 $result[$id] = $name;
             }
         }
@@ -73,6 +73,14 @@ function rectangle($image, $color, $upgrade, $max, $x, $y, $width, $height, $ind
 function text($image, $fontName, $fontSize, $color, $upgrade, $max, $x, $y, $index, $names) {
     if ($upgrade[0] >= $max && array_key_exists($index, $upgrade) && array_key_exists($upgrade[$index], $names)) {
         imagefttext($image, $fontSize, 0, $x, $y, $color, $fontName, $names[$upgrade[$index]]);
+    }
+}
+
+function textOptionalDirect($image, $fontName, $fontSize, $color, $upgrade, $max, $x, $y, $index, $names) {
+    if ($upgrade[0] >= $max && array_key_exists($index, $upgrade) && array_key_exists($upgrade[$index], $names)) {
+        imagefttext($image, $fontSize, 0, $x, $y, $color, $fontName, $names[$upgrade[$index]]);
+    } else if ($upgrade[0] >= $max && array_key_exists($index, $upgrade)) {
+        imagefttext($image, $fontSize, 0, $x, $y, $color, $fontName, $upgrade[$index]);
     }
 }
 
@@ -313,7 +321,7 @@ if ($lang !== null && $id !== null && $taboo !== null) {
                     squares($image, $black, $upgrade5, 2, 64, 530, 37, 16, 16);
                     squares($image, $black, $upgrade6, 3, 64, 655, 59, 16, 16);
                     squares($image, $black, $upgrade7, 4, 64, 779, 80, 16, 16);
-                    $names = load_map('raven_quill_it.tsv', $dictionaries);
+                    $names = load_map('raven_quill_it.tsv', $dictionaries, 'names');
                     text($image, './Arkhamic_v2.1.ttf', 23, $black, $upgrade0, 0, 524, 223, 1, $names);
                     text($image, './Arkhamic_v2.1.ttf', 23, $black, $upgrade4, 2, 211, 510, 1, $names);
                     text($image, './Arkhamic_v2.1.ttf', 23, $black, $upgrade4, 2, 450, 510, 2, $names);
@@ -330,7 +338,7 @@ if ($lang !== null && $id !== null && $taboo !== null) {
                     squares($image, $black, $upgrade5, 2, 66, 552, 39, 16, 16);
                     squares($image, $black, $upgrade6, 3, 66, 653, 62, 16, 16);
                     squares($image, $black, $upgrade7, 4, 66, 755, 84, 16, 16);
-                    $names = load_map('raven_quill_en.tsv', $dictionaries);
+                    $names = load_map('raven_quill_en.tsv', $dictionaries, 'names');
                     text($image, './Arkhamic_v2.1.ttf', 23, $black, $upgrade0, 0, 400, 226, 1, $names);
                     text($image, './Arkhamic_v2.1.ttf', 23, $black, $upgrade4, 2, 144, 529, 1, $names);
                     text($image, './Arkhamic_v2.1.ttf', 23, $black, $upgrade4, 2, 417, 529, 2, $names);
@@ -357,10 +365,10 @@ if ($lang !== null && $id !== null && $taboo !== null) {
                 }
             } else if ($fileToLoad == '09060a.webp') {
                 if ($flang == 'IT') {
-                    //paint Friends in Low Places https://ahlcg.derwinski.pl/IT-09060-0-MHwwfElsbGVjaXRvLDF8MSwyfDJ8VHJ1Y2NoZXR0bywzfDIsNHwyLDV8Miw2fDMsN3wz.webp
-                    //"cus_09060":"0|0|Illecito,1|1,2|2|Trucchetto,3|2,4|2,5|2,6|3,7|3"
-                    //with custom trait names https://ahlcg.derwinski.pl/IT-09060-0-MHwwfFRyYXR0byBBLDF8MSwyfDJ8VHJhdHRvIEIsM3wyLDR8Miw1fDIsNnwzLDd8Mw.webp
-                    //0|0|Tratto A,1|1,2|2|Tratto B,3|2,4|2,5|2,6|3,7|3
+                    //paint Friends in Low Places https://ahlcg.derwinski.pl/IT-09060-0-MHwwfElsbGljaXQsMXwxLDJ8MnxUcmljaywzfDIsNHwyLDV8Miw2fDMsN3wz.webp
+                    //"cus_09060":"0|0|Illicit,1|1,2|2|Trick,3|2,4|2,5|2,6|3,7|3"
+                    //with custom trait names https://ahlcg.derwinski.pl/IT-09060-0-MHwwfFRyYWl0IEEsMXwxLDJ8MnxUcmFpdCBCLDN8Miw0fDIsNXwyLDZ8Myw3fDM.webp
+                    //0|0|Trait A,1|1,2|2|Trait B,3|2,4|2,5|2,6|3,7|3
                     squares($image, $black, $upgrade1, 1, 64, 267, 16, 16, 16);
                     squares($image, $black, $upgrade2, 2, 64, 368, 40, 16, 16);
                     squares($image, $black, $upgrade3, 2, 64, 500, 40, 16, 16);
@@ -368,8 +376,9 @@ if ($lang !== null && $id !== null && $taboo !== null) {
                     squares($image, $black, $upgrade5, 2, 64, 703, 40, 16, 16);
                     squares($image, $black, $upgrade6, 3, 64, 774, 62, 16, 16);
                     squares($image, $black, $upgrade7, 3, 64, 844, 62, 16, 16);
-                    textDirect($image, './arnopro6.otf', 20, $black, $upgrade0, 0, 224, 221, 1);
-                    textDirect($image, './arnopro6.otf', 20, $black, $upgrade2, 2, 475, 384, 1);
+                    $traits = load_map('traits_it.tsv', null, 'traits');
+                    textOptionalDirect($image, './arnopro6.otf', 20, $black, $upgrade0, 0, 224, 221, 1, $traits);
+                    textOptionalDirect($image, './arnopro6.otf', 20, $black, $upgrade2, 2, 475, 384, 1, $traits);
                 } else {
                     //paint Friends in Low Places https://ahlcg.derwinski.pl/EN-09060-0-MHwwfElsbGljaXQsMXwxLDJ8MnxUcmljaywzfDIsNHwyLDV8Miw2fDMsN3wz.webp
                     //"cus_09060":"0|0|Illicit,1|1,2|2|Trick,3|2,4|2,5|2,6|3,7|3"
@@ -559,17 +568,18 @@ if ($lang !== null && $id !== null && $taboo !== null) {
                 }
             } else if ($fileToLoad == '09101a.webp') {
                 if ($flang == 'IT') {
-                    //paint Grizzled https://ahlcg.derwinski.pl/IT-09101-0-MHwwfFVtYW5vaWRlXk1vc3RybywxfDF8U3BldHRyYWxlLDJ8MnxFbGl0ZSwzfDMsNHw0LDV8NQ.webp
-                    //"cus_09101":"0|0|Umanoide^Mostro,1|1|Spettrale,2|2|Elite,3|3,4|4,5|5"
+                    //paint Grizzled https://ahlcg.derwinski.pl/IT-09101-0-MHwwfEh1bWFub2lkXk1vbnN0ZXIsMXwxfFNwZWN0cmFsLDJ8MnxFbGl0ZSwzfDMsNHw0LDV8NQ.webp
+                    //"cus_09101":"0|0|Humanoid^Monster,1|1|Spectral,2|2|Elite,3|3,4|4,5|5"
                     squares($image, $black, $upgrade1, 1, 64, 273, 18, 18, 18);
                     squares($image, $black, $upgrade2, 2, 64, 355, 43, 18, 18);
                     squares($image, $black, $upgrade3, 3, 64, 436, 67, 18, 18);
                     squares($image, $black, $upgrade4, 4, 64, 619, 93, 18, 18);
                     squares($image, $black, $upgrade5, 5, 64, 767, 117, 18, 18);
-                    textDirect($image, './arnopro6.otf', 20, $black, $upgrade0, 0, 240, 227, 1);
-                    textDirect($image, './arnopro6.otf', 20, $black, $upgrade0, 0, 460, 227, 2);
-                    textDirect($image, './arnopro6.otf', 20, $black, $upgrade1, 1, 62, 323, 1);
-                    textDirect($image, './arnopro6.otf', 20, $black, $upgrade2, 2, 62, 405, 1);
+                    $traits = load_map('traits_it.tsv', null, 'traits');
+                    textOptionalDirect($image, './arnopro6.otf', 20, $black, $upgrade0, 0, 240, 227, 1, $traits);
+                    textOptionalDirect($image, './arnopro6.otf', 20, $black, $upgrade0, 0, 460, 227, 2, $traits);
+                    textOptionalDirect($image, './arnopro6.otf', 20, $black, $upgrade1, 1, 62, 323, 1, $traits);
+                    textOptionalDirect($image, './arnopro6.otf', 20, $black, $upgrade2, 2, 62, 405, 1, $traits);
                 } else {
                     //paint Grizzled https://ahlcg.derwinski.pl/EN-09101-0-MHwwfEh1bWFub2lkXk1vbnN0ZXIsMXwxfFNwZWN0cmFsLDJ8MnxFbGl0ZSwzfDMsNHw0LDV8NQ.webp
                     //"cus_09101":"0|0|Humanoid^Monster,1|1|Spectral,2|2|Elite,3|3,4|4,5|5"

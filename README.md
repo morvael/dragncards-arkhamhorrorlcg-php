@@ -60,7 +60,7 @@ RewriteRule ^/([A-Z]{2,2})-([0-9]{4,12}[a-z]?)-([0-9]{1,3})-([A-Za-z0-9-_]{0,102
 RewriteRule ^/([A-Z]{2,2})-([0-9]{4,12}[a-z]?)-([0-9]{1,3})-([A-Za-z0-9-_]{0,1024})\.webp$ image.php?lang=$1&id=$2&taboo=$3&data=$4 [NC,L]
 RewriteRule ^/([0-9]{4,12}[a-z]?)-([0-9]{1,3})-([A-Za-z0-9-_]{0,1024})-([A-Za-z0-9-_]{0,2048})\.webp$ image.php?lang=EN&id=$1&taboo=$2&data=$3&dictionaries=$4 [NC,L]
 RewriteRule ^/([0-9]{4,12}[a-z]?)-([0-9]{1,3})-([A-Za-z0-9-_]{0,1024})\.webp$ image.php?lang=EN&id=$1&taboo=$2&data=$3 [NC,L]
-RewriteRule ^.*$ - [R=404,L]
+RewriteRule ^.*$ bag.html [NC,L]
 ```
 
 #### Repository contents

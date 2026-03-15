@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Arkham Horror LCG Chaos Bag Editor</title>
+        <style>
+            :root {
+                --bg: #161411;
+                --panel: #201c18;
+                --panel-2: #27221d;
+                --panel-3: #2f2923;
+                --border: #4a4036;
+                --text: #e7dccd;
+                --muted: #b2a392;
+                --accent: #8f6a47;
+                --accent-2: #a57b54;
+                --danger: #9c4f49;
+                --shadow: 0 12px 28px rgba(0,0,0,0.38);
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                margin: 0;
+                font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+                background: linear-gradient(180deg, #14120f, #1b1814 45%, #161411);
+                color: var(--text);
+            }
+
+            .app {
+                display: grid;
+                grid-template-columns: 320px 1fr;
+                gap: 16px;
+                padding: 16px;
+                min-height: 100vh;
+            }
+
+            .panel {
+                background: var(--panel);
+                border: 1px solid var(--border);
+                border-radius: 24px;
+                box-shadow: var(--shadow);
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+                min-height: 0;
+            }
+
+            .left-panel {
+                height: calc(100vh - 32px);
+            }
+
+            .panel-header {
+                padding: 16px 18px;
+                border-bottom: 1px solid var(--border);
+                background: linear-gradient(180deg, #26211c, #1f1b17);
+            }
+
+            .panel-title {
+                margin: 0;
+                font-size: 1.15rem;
+                font-weight: 700;
+                color: #f1e4d2;
+            }
+
+            .panel-subtitle {
+                margin: 6px 0 0;
+                color: var(--muted);
+                font-size: 0.92rem;
+                line-height: 1.35;
+            }
+
+            .panel-body {
+                padding: 16px;
+                min-height: 0;
+                flex: 1;
+                overflow: auto;
+            }
+
+            .left-panel .panel-body {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                overflow: hidden;
+                height: 100%;
+            }
+
+            .bag-list-wrap {
+                flex: 1;
+                min-height: 0;
+                overflow: auto;
+                padding-right: 4px;
+            }
+
+            .row {
+                display: flex;
+                gap: 10px;
+                align-items: center;
+            }
+
+            .row.wrap {
+                flex-wrap: wrap;
+            }
+            .row.space {
+                justify-content: space-between;
+            }
+            .stack {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+            .small {
+                font-size: 0.86rem;
+                color: var(--muted);
+            }
+            .mono {
+                font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            }
+
+            button, input, textarea, select {
+                font: inherit;
+            }
+
+            button {
+                border: 1px solid var(--border);
+                background: var(--panel-3);
+                color: var(--text);
+                border-radius: 14px;
+                padding: 10px 14px;
+                cursor: pointer;
+                transition: 0.15s ease;
+            }
+            button:hover {
+                transform: translateY(-1px);
+                background: #3a332c;
+            }
+            button.primary {
+                background: var(--accent);
+                color: #fff6eb;
+                border-color: var(--accent);
+            }
+            button.primary:hover {
+                background: var(--accent-2);
+            }
+            button.danger {
+                color: #fff3f1;
+                background: var(--danger);
+                border-color: var(--danger);
+            }
+
+            input, textarea, select {
+                width: 100%;
+                border: 1px solid var(--border);
+                border-radius: 14px;
+                padding: 10px 12px;
+                background: #171411;
+                color: var(--text);
+            }
+
+            textarea {
+                min-height: 88px;
+                resize: vertical;
+            }
+
+            .bag-list {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .bag-item {
+                border: 1px solid var(--border);
+                background: #191613;
+                border-radius: 18px;
+                padding: 12px;
+                cursor: pointer;
+                transition: 0.15s ease;
+            }
+            .bag-item:hover {
+                background: #221d18;
+            }
+            .bag-item.active {
+                border-color: var(--accent);
+                background: #2a231c;
+            }
+            .bag-item-title {
+                font-weight: 700;
+                margin-bottom: 6px;
+                word-break: break-word;
+                color: #f0e2d0;
+            }
+
+            .section {
+                border: 1px solid var(--border);
+                border-radius: 18px;
+                background: #1b1713;
+                padding: 14px;
+                min-width: 0;
+            }
+            .section h3 {
+                margin: 0 0 10px;
+                font-size: 1rem;
+                color: #efdfcc;
+            }
+
+            .top-row {
+                display: grid;
+                grid-template-columns: minmax(180px, 0.85fr) minmax(220px, 1fr) minmax(260px, 1.1fr);
+                gap: 12px;
+                align-items: stretch;
+            }
+
+            .compact textarea {
+                min-height: 82px;
+            }
+
+            .badge {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-width: 28px;
+                height: 28px;
+                padding: 0 8px;
+                border-radius: 999px;
+                background: #3a3128;
+                color: #f0dfcb;
+                font-size: 0.82rem;
+                font-weight: 700;
+                border: 1px solid var(--border);
+            }
+
+            .dropzone {
+                border: 2px dashed var(--border);
+                border-radius: 22px;
+                padding: 14px;
+                background: var(--panel-2);
+                transition: 0.15s ease;
+                min-height: 120px;
+            }
+            .dropzone.active {
+                border-color: var(--accent);
+                background: #342c24;
+            }
+
+            .status {
+                padding: 12px 14px;
+                border-radius: 16px;
+                background: #2a231c;
+                border: 1px solid var(--border);
+                font-size: 0.92rem;
+                color: #f0dfcb;
+            }
+
+            .token-cloud {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                align-items: flex-start;
+                align-content: flex-start;
+                min-height: 56px;
+            }
+
+            .token-cloud.bag-grid {
+                min-height: 132px;
+            }
+
+            .token-cloud.palette-grid {
+                min-height: 198px;
+            }
+
+            @media (hover: none) and (pointer: coarse) {
+                .token-image {
+                    cursor: pointer;
+                }
+            }
+
+            .token-image {
+                width: 56px;
+                height: 56px;
+                border-radius: 999px;
+                border: none;
+                background: transparent;
+                box-shadow: none;
+                object-fit: cover;
+                cursor: grab;
+                user-select: none;
+                -webkit-user-drag: element;
+                flex: 0 0 auto;
+            }
+
+            .token-image:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+            }
+
+            .file-button {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                cursor: pointer;
+                border: 1px solid var(--border);
+                padding: 10px 14px;
+                border-radius: 14px;
+                background: var(--panel-3);
+                color: var(--text);
+            }
+
+            @media (max-width: 1100px) {
+                .top-row {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            @media (max-width: 980px) {
+                .app {
+                    grid-template-columns: 1fr;
+                }
+                .left-panel {
+                    height: auto;
+                }
+                .left-panel .panel-body {
+                    overflow: auto;
+                }
+                .bag-list-wrap {
+                    max-height: 320px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div id="app" class="app"></div>
+
+        <script>
+            const STORAGE_KEY = 'arkham-chaos-bag-editor';
+            const TOKEN_DEFS = [
+                {id: 'p1', label: '+1', imageUrl: 'https://dragncards-ahlcg.s3.amazonaws.com/images/chaos_tokens/p1.webp', max: 3},
+                {id: 'p0', label: '0', imageUrl: 'https://dragncards-ahlcg.s3.amazonaws.com/images/chaos_tokens/p0.webp', max: 4},
+                {id: 'm1', label: '-1', imageUrl: 'https://dragncards-ahlcg.s3.amazonaws.com/images/chaos_tokens/m1.webp', max: 5},
+                {id: 'm2', label: '-2', imageUrl: 'https://dragncards-ahlcg.s3.amazonaws.com/images/chaos_tokens/m2.webp', max: 4},
+                {id: 'm3', label: '-3', imageUrl: 'https://dragncards-ahlcg.s3.amazonaws.com/images/chaos_tokens/m3.webp', max: 3},
+                {id: 'm4', label: '-4', imageUrl: 'https://dragncards-ahlcg.s3.amazonaws.com/images/chaos_tokens/m4.webp', max: 2},
+                {id: 'm5', label: '-5', imageUrl: 'https://dragncards-ahlcg.s3.amazonaws.com/images/chaos_tokens/m5.webp', max: 2},
+                {id: 'm6', label: '-6', imageUrl: 'https://dragncards-ahlcg.s3.amazonaws.com/images/chaos_tokens/m6.webp', max: 1},
+                {id: 'm7', label: '-7', imageUrl: 'https://dragncards-ahlcg.s3.amazonaws.com/images/chaos_tokens/m7.webp', max: 1},
+                {id: 'm8', label: '-8', imageUrl: 'https://dragncards-ahlcg.s3.amazonaws.com/images/chaos_tokens/m8.webp', max: 1},
+                {id: 'sk', label: 'Skull', imageUrl: 'https://dragncards-ahlcg.s3.amazonaws.com/images/chaos_tokens/skull.webp', max: 4},
+                {id: 'cl', label: 'Cultist', imageUrl: 'https://dragncards-ahlcg.s3.amazonaws.com/images/chaos_tokens/cultist.webp', max: 4},
+                {id: 'tb', label: 'Tablet', imageUrl: 'https://dragncards-ahlcg.s3.amazonaws.com/images/chaos_tokens/tablet.webp', max: 4},
+                {id: 'et', label: 'Elder Thing', imageUrl: 'https://dragncards-ahlcg.s3.amazonaws.com/images/chaos_tokens/elder_thing.webp', max: 4},
+                {id: 'af', label: 'Auto Fail', imageUrl: 'https://dragncards-ahlcg.s3.amazonaws.com/images/chaos_tokens/auto_fail.webp', max: 1},
+                {id: 'es', label: 'Elder Sign', imageUrl: 'https://dragncards-ahlcg.s3.amazonaws.com/images/chaos_tokens/elder_sign.webp', max: 1},
+                {id: 'bl', label: 'Bless', imageUrl: 'https://dragncards-ahlcg.s3.amazonaws.com/images/chaos_tokens/bless.webp', max: 10},
+                {id: 'cr', label: 'Curse', imageUrl: 'https://dragncards-ahlcg.s3.amazonaws.com/images/chaos_tokens/curse.webp', max: 10},
+                {id: 'fr', label: 'Frost', imageUrl: 'https://dragncards-ahlcg.s3.amazonaws.com/images/chaos_tokens/frost.webp', max: 8}
+            ];
+
+            const TOKEN_INDEX = Object.fromEntries(TOKEN_DEFS.map(t => [t.id, t]));
+            const EMPTY_COUNTS = Object.fromEntries(TOKEN_DEFS.map(t => [t.id, 0]));
+
+            const PRESETS = [
+                {id: 'notz-easy', name: 'Night of the Zealot - Easy', counts: {p1: 2, p0: 3, m1: 3, m2: 2, sk: 2, cl: 1, tb: 1, af: 1, es: 1}},
+                {id: 'notz-standard', name: 'Night of the Zealot - Standard', counts: {p1: 1, p0: 2, m1: 3, m2: 2, m3: 1, m4: 1, sk: 2, cl: 1, tb: 1, af: 1, es: 1}},
+                {id: 'notz-hard', name: 'Night of the Zealot - Hard', counts: {p0: 3, m1: 2, m2: 2, m3: 2, m4: 1, m5: 1, sk: 2, cl: 1, tb: 1, af: 1, es: 1}},
+                {id: 'notz-expert', name: 'Night of the Zealot - Expert', counts: {p0: 1, m1: 2, m2: 2, m3: 2, m4: 2, m5: 1, m6: 1, m8: 1, sk: 2, cl: 1, tb: 1, af: 1, es: 1}},
+                {id: 'tdl-easy', name: 'The Dunwich Legacy - Easy', counts: {p1: 2, p0: 3, m1: 3, m2: 2, sk: 2, cl: 1, af: 1, es: 1}},
+                {id: 'tdl-standard', name: 'The Dunwich Legacy - Standard', counts: {p1: 1, p0: 2, m1: 3, m2: 2, m3: 1, m4: 1, sk: 2, cl: 1, af: 1, es: 1}},
+                {id: 'tdl-hard', name: 'The Dunwich Legacy - Hard', counts: {p0: 3, m1: 2, m2: 2, m3: 2, m4: 1, m5: 1, sk: 2, cl: 1, af: 1, es: 1}},
+                {id: 'tdl-expert', name: 'The Dunwich Legacy - Expert', counts: {p0: 1, m1: 2, m2: 2, m3: 2, m4: 2, m5: 1, m6: 1, m8: 1, sk: 2, cl: 1, af: 1, es: 1}},
+                {id: 'tptc-easy', name: 'The Path to Carcosa - Easy', counts: {p1: 2, p0: 3, m1: 3, m2: 2, sk: 3, af: 1, es: 1}},
+                {id: 'tptc-standard', name: 'The Path to Carcosa - Standard', counts: {p1: 1, p0: 2, m1: 3, m2: 2, m3: 1, m4: 1, sk: 3, af: 1, es: 1}},
+                {id: 'tptc-hard', name: 'The Path to Carcosa - Hard', counts: {p0: 3, m1: 2, m2: 2, m3: 2, m4: 1, m5: 1, sk: 3, af: 1, es: 1}},
+                {id: 'tptc-expert', name: 'The Path to Carcosa - Expert', counts: {p0: 1, m1: 2, m2: 2, m3: 2, m4: 2, m5: 1, m6: 1, m8: 1, sk: 3, af: 1, es: 1}},
+                {id: 'tfa-easy', name: 'The Forgotten Age - Easy', counts: {p1: 2, p0: 3, m1: 2, m2: 1, m3: 1, sk: 2, et: 1, af: 1, es: 1}},
+                {id: 'tfa-standard', name: 'The Forgotten Age - Standard', counts: {p1: 1, p0: 3, m1: 1, m2: 2, m3: 1, m5: 1, sk: 2, et: 1, af: 1, es: 1}},
+                {id: 'tfa-hard', name: 'The Forgotten Age - Hard', counts: {p1: 1, p0: 2, m1: 1, m2: 1, m3: 2, m4: 1, m6: 1, sk: 2, et: 1, af: 1, es: 1}},
+                {id: 'tfa-expert', name: 'The Forgotten Age - Expert', counts: {p0: 1, m1: 1, m2: 2, m3: 2, m4: 2, m6: 1, m8: 1, sk: 2, et: 1, af: 1, es: 1}},
+                {id: 'tcu-easy', name: 'The Circle Undone - Easy', counts: {p1: 2, p0: 3, m1: 2, m2: 2, m3: 1, sk: 2, af: 1, es: 1}},
+                {id: 'tcu-standard', name: 'The Circle Undone - Standard', counts: {p1: 1, p0: 2, m1: 2, m2: 2, m3: 1, m4: 1, sk: 2, af: 1, es: 1}},
+                {id: 'tcu-hard', name: 'The Circle Undone - Hard', counts: {p0: 2, m1: 2, m2: 2, m3: 1, m4: 1, m5: 1, sk: 2, af: 1, es: 1}},
+                {id: 'tcu-expert', name: 'The Circle Undone - Expert', counts: {p0: 1, m1: 2, m2: 2, m3: 1, m4: 1, m6: 1, m8: 1, sk: 2, af: 1, es: 1}},
+                {id: 'tdq-easy', name: 'The Dream-Quest - Easy', counts: {p1: 2, p0: 3, m1: 2, m2: 2, cl: 1, tb: 2, af: 1, es: 1}},
+                {id: 'tdq-standard', name: 'The Dream-Quest - Standard', counts: {p1: 1, p0: 2, m1: 2, m2: 2, m3: 1, m4: 1, cl: 1, tb: 2, af: 1, es: 1}},
+                {id: 'tdq-hard', name: 'The Dream-Quest - Hard', counts: {p0: 2, m1: 2, m2: 2, m3: 2, m4: 1, m5: 1, cl: 1, tb: 2, af: 1, es: 1}},
+                {id: 'tdq-expert', name: 'The Dream-Quest - Expert', counts: {p0: 1, m1: 2, m2: 2, m3: 1, m4: 2, m5: 1, m6: 1, m8: 1, cl: 1, tb: 2, af: 1, es: 1}},
+                {id: 'twod-easy', name: 'The Web of Dreams - Easy', counts: {p1: 2, p0: 3, m1: 3, m2: 2, sk: 2, cl: 1, et: 2, af: 1, es: 1}},
+                {id: 'twod-standard', name: 'The Web of Dreams - Standard', counts: {p1: 1, p0: 2, m1: 3, m2: 2, m3: 1, m4: 1, sk: 2, cl: 1, et: 2, af: 1, es: 1}},
+                {id: 'twod-hard', name: 'The Web of Dreams - Hard', counts: {p0: 3, m1: 2, m2: 2, m3: 2, m4: 1, m5: 1, sk: 2, cl: 1, et: 2, af: 1, es: 1}},
+                {id: 'twod-expert', name: 'The Web of Dreams - Expert', counts: {p0: 1, m1: 2, m2: 2, m3: 2, m4: 2, m5: 1, m6: 1, m8: 1, sk: 2, cl: 1, et: 2, af: 1, es: 1}},
+                {id: 'tic-easy', name: 'The Innsmouth Conspiracy - Easy', counts: {p1: 2, p0: 3, m1: 3, m2: 2, sk: 2, cl: 2, tb: 2, et: 2, af: 1, es: 1}},
+                {id: 'tic-standard', name: 'The Innsmouth Conspiracy - Standard', counts: {p1: 1, p0: 2, m1: 3, m2: 2, m3: 1, m4: 1, sk: 2, cl: 2, tb: 2, et: 2, af: 1, es: 1}},
+                {id: 'tic-hard', name: 'The Innsmouth Conspiracy - Hard', counts: {p0: 3, m1: 2, m2: 2, m3: 2, m4: 1, m5: 1, sk: 2, cl: 2, tb: 2, et: 2, af: 1, es: 1}},
+                {id: 'tic-expert', name: 'The Innsmouth Conspiracy - Expert', counts: {p0: 1, m1: 2, m2: 2, m3: 2, m4: 2, m5: 1, m6: 1, m8: 1, sk: 2, cl: 2, tb: 2, et: 2, af: 1, es: 1}},
+                {id: 'eote-easy', name: 'Edge of the Earth - Easy', counts: {p1: 3, p0: 2, m1: 3, m2: 2, sk: 2, cl: 1, tb: 1, et: 1, af: 1, es: 1}},
+                {id: 'eote-standard', name: 'Edge of the Earth - Standard', counts: {p1: 1, p0: 2, m1: 3, m2: 2, m3: 1, m4: 1, sk: 2, cl: 1, tb: 1, et: 1, af: 1, es: 1, fr: 1}},
+                {id: 'eote-hard', name: 'Edge of the Earth - Hard', counts: {p0: 2, m1: 2, m2: 2, m3: 1, m4: 2, m5: 1, sk: 2, cl: 1, tb: 1, et: 1, af: 1, es: 1, fr: 2}},
+                {id: 'eote-expert', name: 'Edge of the Earth - Expert', counts: {p0: 1, m1: 1, m2: 2, m3: 1, m4: 2, m5: 1, m7: 1, sk: 2, cl: 1, tb: 1, et: 1, af: 1, es: 1, fr: 3}}
+            ];
+
+            function uid() {
+                return Math.random().toString(36).slice(2, 10);
+            }
+            function nowIso() {
+                return new Date().toISOString();
+            }
+            function clone(obj) {
+                return typeof structuredClone === 'function' ? structuredClone(obj) : JSON.parse(JSON.stringify(obj));
+            }
+
+            function createBag(name = 'New Bag') {
+                const ts = nowIso();
+                return {id: uid(), name, createdAt: ts, updatedAt: ts, counts: {...EMPTY_COUNTS}};
+            }
+
+            function sanitizeBag(bag) {
+                return {...createBag(), ...bag, counts: {...EMPTY_COUNTS, ...(bag.counts || {})}};
+            }
+
+            function sortBags(bags) {
+                return [...bags].sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+            }
+
+            function loadState() {
+                try {
+                    const raw = localStorage.getItem(STORAGE_KEY);
+                    if (!raw) {
+                        const starter = createBag('First Bag');
+                        return {bags: [starter], selectedBagId: starter.id, shareText: '', status: 'Ready.', activePresetId: 'notz-standard', presetInputValue: 'Night of the Zealot - Standard'};
+                    }
+                    const parsed = JSON.parse(raw);
+                    const bags = Array.isArray(parsed.bags) && parsed.bags.length ? sortBags(parsed.bags.map(sanitizeBag)) : [createBag('First Bag')];
+                    return {
+                        bags,
+                        selectedBagId: parsed.selectedBagId || bags[0].id,
+                        shareText: parsed.shareText || '',
+                        status: 'Ready.',
+                        activePresetId: parsed.activePresetId || 'notz-standard',
+                        presetInputValue: parsed.presetInputValue || ''
+                    };
+                } catch {
+                    const starter = createBag('First Bag');
+                    return {bags: [starter], selectedBagId: starter.id, shareText: '', status: 'Local storage could not be read, so a fresh state was created.', activePresetId: 'notz-standard', presetInputValue: 'Night of the Zealot - Standard'};
+                }
+            }
+
+            function saveState(state) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                    bags: state.bags,
+                    selectedBagId: state.selectedBagId,
+                    shareText: state.shareText,
+                    activePresetId: state.activePresetId,
+                    presetInputValue: state.presetInputValue || ''
+                }));
+            }
+
+            function totalTokens(counts) {
+                return TOKEN_DEFS.reduce((sum, token) => sum + (counts[token.id] || 0), 0);
+            }
+
+            function formatDate(value) {
+                return new Intl.DateTimeFormat('en-GB', {
+                    year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false
+                }).format(new Date(value));
+            }
+
+            function escapeHtml(str) {
+                return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+            }
+
+            function utf8ToBase64Url(str) {
+                const bytes = new TextEncoder().encode(str);
+                let binary = '';
+                for (let i = 0; i < bytes.length; i++)
+                    binary += String.fromCharCode(bytes[i]);
+                return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+            }
+
+            function base64UrlToUtf8(str) {
+                const padded = str.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - str.length % 4) % 4);
+                const binary = atob(padded);
+                const bytes = new Uint8Array(binary.length);
+                for (let i = 0; i < binary.length; i++)
+                    bytes[i] = binary.charCodeAt(i);
+                return new TextDecoder().decode(bytes);
+            }
+
+            function serializeBagForShare(bag) {
+                const ids = [];
+                for (const token of TOKEN_DEFS) {
+                    const count = Math.max(0, Math.min(token.max, Number(bag.counts[token.id]) || 0));
+                    for (let i = 0; i < count; i++)
+                        ids.push(token.id);
+                }
+                return utf8ToBase64Url(ids.join(','));
+            }
+
+            function deserializeBagFromShare(text) {
+                const decoded = base64UrlToUtf8(text.trim());
+                const bag = createBag('Imported Bag');
+                if (!decoded)
+                    return bag;
+                const ids = decoded.split(',').map(s => s.trim()).filter(Boolean);
+                for (const id of ids) {
+                    const token = TOKEN_INDEX[id];
+                    if (!token)
+                        continue;
+                    bag.counts[id] = Math.min(token.max, (bag.counts[id] || 0) + 1);
+                }
+                return bag;
+            }
+
+            function countAvailableInPalette(bag, tokenId) {
+                const token = TOKEN_INDEX[tokenId];
+                const used = bag?.counts?.[tokenId] || 0;
+                return Math.max(0, token.max - used);
+            }
+
+            function makeTokenInstancesFromCounts(counts) {
+                const instances = [];
+                for (const token of TOKEN_DEFS) {
+                    const count = counts[token.id] || 0;
+                    for (let i = 0; i < count; i++)
+                        instances.push({tokenId: token.id, key: `${token.id}_${i}`});
+                }
+                return instances;
+            }
+
+            function makePaletteInstances(bag) {
+                const instances = [];
+                for (const token of TOKEN_DEFS) {
+                    const available = countAvailableInPalette(bag, token.id);
+                    for (let i = 0; i < available; i++)
+                        instances.push({tokenId: token.id, key: `${token.id}_p_${i}`});
+                }
+                return instances;
+            }
+
+            const state = loadState();
+            if (!state.presetInputValue) {
+                const initialPreset = PRESETS.find(p => p.id === state.activePresetId) || PRESETS[0] || {name: ''};
+                state.presetInputValue = initialPreset.name;
+            }
+            const app = document.getElementById('app');
+            const IS_MOBILE_POINTER = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+
+            function getSelectedBag() {
+                const sorted = sortBags(state.bags);
+                return state.bags.find(b => b.id === state.selectedBagId) || sorted[0] || null;
+            }
+
+            function syncShareText() {
+                const selected = getSelectedBag();
+                state.shareText = selected ? serializeBagForShare(selected) : '';
+            }
+
+            function persistAndRender() {
+                const selected = getSelectedBag();
+                if (selected)
+                    state.selectedBagId = selected.id;
+                syncShareText();
+                saveState(state);
+                render();
+            }
+
+            function setStatus(text) {
+                state.status = text;
+                persistAndRender();
+            }
+
+            function updateBag(id, updater, statusMessage) {
+                state.bags = sortBags(state.bags.map(bag => {
+                    if (bag.id !== id)
+                        return bag;
+                    const updated = sanitizeBag(updater(clone(bag)));
+                    updated.updatedAt = nowIso();
+                    return updated;
+                }));
+                if (statusMessage)
+                    state.status = statusMessage;
+                persistAndRender();
+            }
+
+            function createNewBag() {
+                const bag = createBag(`Bag ${state.bags.length + 1}`);
+                state.bags = sortBags([bag, ...state.bags]);
+                state.selectedBagId = bag.id;
+                state.status = 'Created a new bag.';
+                persistAndRender();
+            }
+
+            function duplicateBag() {
+                const selected = getSelectedBag();
+                if (!selected)
+                    return;
+                const cloned = sanitizeBag(clone(selected));
+                cloned.id = uid();
+                cloned.name = `${selected.name} Copy`;
+                cloned.createdAt = nowIso();
+                cloned.updatedAt = nowIso();
+                state.bags = sortBags([cloned, ...state.bags]);
+                state.selectedBagId = cloned.id;
+                state.status = 'Bag duplicated.';
+                persistAndRender();
+            }
+
+            function deleteSelectedBag() {
+                const selected = getSelectedBag();
+                if (!selected)
+                    return;
+                state.bags = state.bags.filter(b => b.id !== selected.id);
+                if (!state.bags.length) {
+                    const starter = createBag('First Bag');
+                    state.bags = [starter];
+                    state.selectedBagId = starter.id;
+                } else {
+                    state.bags = sortBags(state.bags);
+                    state.selectedBagId = state.bags[0].id;
+                }
+                state.status = 'Bag deleted.';
+                persistAndRender();
+            }
+
+            function addToken(tokenId) {
+                const selected = getSelectedBag();
+                if (!selected)
+                    return;
+                const token = TOKEN_INDEX[tokenId];
+                const current = selected.counts[tokenId] || 0;
+                if (current >= token.max)
+                    return setStatus(`Limit reached for ${token.label}.`);
+                updateBag(selected.id, bag => {
+                    bag.counts[tokenId] = current + 1;
+                    return bag;
+                }, `Added ${token.label}.`);
+            }
+
+            function removeToken(tokenId) {
+                const selected = getSelectedBag();
+                if (!selected)
+                    return;
+                const current = selected.counts[tokenId] || 0;
+                if (current <= 0)
+                    return setStatus(`No ${TOKEN_INDEX[tokenId].label} to remove.`);
+                updateBag(selected.id, bag => {
+                    bag.counts[tokenId] = current - 1;
+                    return bag;
+                }, `Removed ${TOKEN_INDEX[tokenId].label}.`);
+            }
+
+            function clearBag() {
+                const selected = getSelectedBag();
+                if (!selected)
+                    return;
+                updateBag(selected.id, bag => {
+                    bag.counts = {...EMPTY_COUNTS};
+                    return bag;
+                }, 'Bag cleared.');
+            }
+
+            function resolvePresetInput(value) {
+                const normalized = String(value || '').trim().toLowerCase();
+                if (!normalized)
+                    return null;
+                const exact = PRESETS.find(p => p.name.toLowerCase() === normalized || p.id.toLowerCase() === normalized);
+                if (exact)
+                    return exact;
+                return PRESETS.find(p => p.name.toLowerCase().includes(normalized) || p.id.toLowerCase().includes(normalized)) || null;
+            }
+
+            function applyPreset(mode) {
+                const selected = getSelectedBag();
+                const preset = resolvePresetInput(state.presetInputValue) || PRESETS.find(p => p.id === state.activePresetId);
+                if (!selected || !preset)
+                    return;
+                updateBag(selected.id, bag => {
+                    const counts = mode === 'replace' ? {...EMPTY_COUNTS} : {...bag.counts};
+                    for (const [tokenId, amount] of Object.entries(preset.counts)) {
+                        const token = TOKEN_INDEX[tokenId];
+                        if (!token)
+                            continue;
+                        const base = mode === 'replace' ? 0 : (counts[tokenId] || 0);
+                        counts[tokenId] = Math.max(0, Math.min(token.max, base + amount));
+                    }
+                    bag.counts = counts;
+                    return bag;
+                }, `${mode === 'replace' ? 'Bag replaced with' : 'Added'} preset: ${preset.name}.`);
+            }
+
+            function updateBagName(value) {
+                const selected = getSelectedBag();
+                if (!selected)
+                    return;
+                state.bags = state.bags.map(bag => {
+                    if (bag.id !== selected.id)
+                        return bag;
+                    return {...bag, name: value};
+                });
+                saveState(state);
+            }
+
+            async function copyShareString() {
+                const selected = getSelectedBag();
+                if (!selected)
+                    return;
+                try {
+                    const text = serializeBagForShare(selected);
+                    state.shareText = text;
+                    await navigator.clipboard.writeText(text);
+                    state.status = 'Value copied.';
+                    persistAndRender();
+                } catch {
+                    state.status = 'Could not copy automatically. Use the text area to copy manually.';
+                    persistAndRender();
+                }
+            }
+
+            function importFromShare() {
+                const selected = getSelectedBag();
+                if (!selected)
+                    return;
+                try {
+                    const imported = deserializeBagFromShare(state.shareText);
+                    updateBag(selected.id, bag => {
+                        bag.counts = {...imported.counts};
+                        return bag;
+                    }, 'Bag replaced with value.');
+                } catch {
+                    state.status = 'Failed to replace bag with value.';
+                    persistAndRender();
+                }
+            }
+
+            function exportAllBags() {
+                const blob = new Blob([JSON.stringify({bags: state.bags}, null, 2)], {type: 'application/json'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'arkham-chaos-bags.json';
+                a.click();
+                URL.revokeObjectURL(url);
+                setStatus('Site data exported to JSON.');
+            }
+
+            function importAllBags(file) {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    try {
+                        const parsed = JSON.parse(reader.result);
+                        const bags = Array.isArray(parsed.bags) ? parsed.bags.map(sanitizeBag) : [];
+                        if (!bags.length)
+                            throw new Error();
+                        state.bags = sortBags(bags);
+                        state.selectedBagId = state.bags[0].id;
+                        state.status = 'Site data restored from JSON.';
+                        persistAndRender();
+                    } catch {
+                        state.status = 'Failed to restore site data from JSON.';
+                        persistAndRender();
+                    }
+                };
+                reader.readAsText(file);
+            }
+
+            function renderTokenImage(instance, source) {
+                const token = TOKEN_INDEX[instance.tokenId];
+                return `<img class="token-image" src="${escapeHtml(token.imageUrl)}" alt="${escapeHtml(token.label)}" title="${escapeHtml(token.label)}" draggable="true" data-token-id="${escapeHtml(token.id)}" data-source="${escapeHtml(source)}" data-key="${escapeHtml(instance.key)}">`;
+            }
+
+            function setDropzoneActive(element, active) {
+                if (!element)
+                    return;
+                element.classList.toggle('active', !!active);
+            }
+
+            function bindDropzone(dropzone, expectedSource, onAccept) {
+                let dragDepth = 0;
+
+                dropzone.addEventListener('dragenter', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dragDepth += 1;
+                    setDropzoneActive(dropzone, true);
+                });
+
+                dropzone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (e.dataTransfer)
+                        e.dataTransfer.dropEffect = 'move';
+                    setDropzoneActive(dropzone, true);
+                });
+
+                dropzone.addEventListener('dragleave', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dragDepth = Math.max(0, dragDepth - 1);
+                    if (dragDepth === 0) {
+                        setDropzoneActive(dropzone, false);
+                    }
+                });
+
+                dropzone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dragDepth = 0;
+                    setDropzoneActive(dropzone, false);
+
+                    try {
+                        const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+                        if (data.source === expectedSource) {
+                            onAccept(data.tokenId);
+                        }
+                    } catch {
+                        // ignore invalid payload
+                    }
+                });
+            }
+
+            function render() {
+                const selected = getSelectedBag();
+                const bags = sortBags(state.bags);
+                const total = selected ? totalTokens(selected.counts) : 0;
+                const bagInstances = selected ? makeTokenInstancesFromCounts(selected.counts) : [];
+                const paletteInstances = selected ? makePaletteInstances(selected) : [];
+
+                app.innerHTML = `
+              <section class="panel left-panel">
+                <div class="panel-header">
+                  <div class="row space">
+                    <div>
+                      <h2 class="panel-title">Your Bags</h2>
+                      <p class="panel-subtitle">Saved locally in your browser, sorted by most recently updated.</p>
+                    </div>
+                    <button class="primary" id="newBagBtn">New</button>
+                  </div>
+                </div>
+                <div class="panel-body">
+                  <div class="bag-list-wrap">
+                    <div class="bag-list">
+                      ${bags.map(bag => `
+                        <div class="bag-item ${bag.id === selected?.id ? 'active' : ''}" data-select-bag="${escapeHtml(bag.id)}">
+                          <div class="bag-item-title">${escapeHtml(bag.name || 'Untitled Bag')}</div>
+                          <div class="small">Updated ${escapeHtml(formatDate(bag.updatedAt))}</div>
+                          <div class="small">${totalTokens(bag.counts)} tokens</div>
+                        </div>
+                      `).join('')}
+                    </div>
+                  </div>
+
+                  <div class="section stack">
+                    <h3>Site Data</h3>
+                    <div class="row wrap">
+                      <button id="backupJsonBtn">Backup</button>
+                      <label class="file-button">
+                        <input id="restoreJsonInput" type="file" accept="application/json" style="display:none;" />
+                        <span>Restore</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section class="panel">
+                <div class="panel-header">
+                  <div class="row space wrap">
+                    <div>
+                      <h2 class="panel-title">Chaos Bag Editor</h2>
+                      <p class="panel-subtitle">Arkham Horror: The Card Game™ and all related content © Fantasy Flight Games (FFG). This site is not produced, endorsed by or affiliated with FFG.</p>
+                    </div>
+                    <div class="row wrap">
+                      <button id="duplicateBagBtn">Duplicate</button>
+                      <button id="clearBagBtn">Clear</button>
+                      <button id="deleteBagBtn" class="danger">Delete</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="panel-body stack">
+                  <div class="top-row">
+                    <div class="section stack" style="height:100%;">
+                      <h3>Details</h3>
+                      <div>
+                        <label class="small">Name</label>
+                        <input id="bagNameInput" value="${escapeHtml(selected?.name || '')}" placeholder="Name" />
+                      </div>
+                      <div class="row wrap">
+                        <div class="badge">${total} tokens</div>
+                        <div class="small">${selected ? escapeHtml(formatDate(selected.updatedAt)) : ''}</div>
+                      </div>
+                    </div>
+
+                    <div class="section stack" style="height:100%;">
+                      <h3>Presets</h3>
+                      <div>
+                        <label class="small">Name</label>
+                        <input id="presetInput" list="presetOptions" value="${escapeHtml(state.presetInputValue || '')}" placeholder="Type to search" autocomplete="off" />
+                        <datalist id="presetOptions">
+                          ${PRESETS.map(p => `<option value="${escapeHtml(p.name)}"></option>`).join('')}
+                        </datalist>
+                      </div>
+                      <div class="row wrap">
+                        <button id="replacePresetBtn">Replace</button>
+                        <button id="addPresetBtn">Add</button>
+                      </div>
+                    </div>
+
+                    <div class="section stack compact" style="height:100%;">
+                      <h3>Sharing</h3>
+                      <div>
+                        <label class="small">Value</label>
+                        <textarea id="shareTextArea" class="mono" placeholder="Base64url of comma-separated token ids">${escapeHtml(state.shareText || '')}</textarea>
+                      </div>
+                      <div class="row wrap">
+                        <button id="copyShareBtn" class="primary">Copy</button>
+                        <button id="importShareBtn">Replace</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="dropzone" id="bagDropzone">
+                    <div class="row space wrap" style="margin-bottom:12px;">
+                      <strong>Bag</strong>
+                      <span class="small">${IS_MOBILE_POINTER ? (bagInstances.length ? 'Tap bag tokens to remove them' : 'Tap tokens in the pool to add them') : (bagInstances.length ? 'Drag chaos tokens into the pool to remove them' : 'Drop chaos tokens here to add them')}</span>
+                    </div>
+                    <div class="token-cloud bag-grid" id="bagTokenCloud">
+                      ${bagInstances.length ? bagInstances.map(instance => renderTokenImage(instance, 'bag')).join('') : '<div class="small">Bag is empty.</div>'}
+                    </div>
+                  </div>
+
+                  <div class="dropzone" id="paletteDropzone">
+                    <div class="row space wrap" style="margin-bottom:12px;">
+                      <strong>Pool</strong>
+                      <span class="small">${IS_MOBILE_POINTER ? (paletteInstances.length ? 'Tap pool tokens to add them' : 'Tap bag tokens to remove them') : (paletteInstances.length ? 'Drag chaos tokens into the bag to add them' : 'Drop chaos tokens here to remove them')}</span>
+                    </div>
+                    <div class="token-cloud palette-grid" id="paletteTokenCloud">
+                      ${paletteInstances.length ? paletteInstances.map(instance => renderTokenImage(instance, 'palette')).join('') : '<div class="small">Pool is empty.</div>'}
+                    </div>
+                  </div>
+
+                  <div class="status">${escapeHtml(state.status)}</div>
+                </div>
+              </section>
+            `;
+
+                bindEvents();
+            }
+
+            function bindEvents() {
+                document.getElementById('newBagBtn').onclick = createNewBag;
+                document.getElementById('duplicateBagBtn').onclick = duplicateBag;
+                document.getElementById('clearBagBtn').onclick = clearBag;
+                document.getElementById('deleteBagBtn').onclick = deleteSelectedBag;
+                document.getElementById('backupJsonBtn').onclick = exportAllBags;
+                document.getElementById('replacePresetBtn').onclick = () => applyPreset('replace');
+                document.getElementById('addPresetBtn').onclick = () => applyPreset('add');
+                document.getElementById('copyShareBtn').onclick = copyShareString;
+                document.getElementById('importShareBtn').onclick = importFromShare;
+
+                document.getElementById('presetInput').oninput = (e) => {
+                    state.presetInputValue = e.target.value;
+                    const match = resolvePresetInput(e.target.value);
+                    if (match) {
+                        state.activePresetId = match.id;
+                    }
+                    saveState(state);
+                };
+                document.getElementById('presetInput').onchange = (e) => {
+                    state.presetInputValue = e.target.value;
+                    const match = resolvePresetInput(e.target.value);
+                    if (match) {
+                        state.activePresetId = match.id;
+                    } else {
+                        state.status = 'Preset not found.';
+                    }
+                    saveState(state);
+                };
+
+                document.getElementById('bagNameInput').oninput = (e) => updateBagName(e.target.value);
+                document.getElementById('bagNameInput').onblur = () => {
+                    const selected = getSelectedBag();
+                    if (!selected)
+                        return;
+                    state.bags = sortBags(state.bags.map(bag => {
+                        if (bag.id !== selected.id)
+                            return bag;
+                        return {...bag, updatedAt: nowIso()};
+                    }));
+                    state.status = 'Bag name updated.';
+                    persistAndRender();
+                };
+                document.getElementById('shareTextArea').oninput = (e) => {
+                    state.shareText = e.target.value;
+                    saveState(state);
+                };
+
+                document.querySelectorAll('[data-select-bag]').forEach(el => {
+                    el.onclick = () => {
+                        state.selectedBagId = el.getAttribute('data-select-bag');
+                        state.status = 'Bag selected.';
+                        persistAndRender();
+                    };
+                });
+
+                document.querySelectorAll('.token-image[data-source]').forEach(el => {
+                    el.addEventListener('dragstart', (e) => {
+                        e.dataTransfer.effectAllowed = 'move';
+                        e.dataTransfer.setData('text/plain', JSON.stringify({
+                            source: el.getAttribute('data-source'),
+                            tokenId: el.getAttribute('data-token-id'),
+                            key: el.getAttribute('data-key')
+                        }));
+                    });
+
+                    if (IS_MOBILE_POINTER) {
+                        el.addEventListener('click', () => {
+                            const source = el.getAttribute('data-source');
+                            const tokenId = el.getAttribute('data-token-id');
+                            if (source === 'palette')
+                                addToken(tokenId);
+                            if (source === 'bag')
+                                removeToken(tokenId);
+                        });
+                    }
+                });
+
+                bindDropzone(document.getElementById('bagDropzone'), 'palette', addToken);
+                bindDropzone(document.getElementById('paletteDropzone'), 'bag', removeToken);
+
+                document.getElementById('restoreJsonInput').addEventListener('change', (e) => {
+                    const file = e.target.files?.[0];
+                    if (file)
+                        importAllBags(file);
+                });
+            }
+
+            syncShareText();
+            render();
+        </script>
+    </body>
+</html>

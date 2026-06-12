@@ -322,9 +322,9 @@ if ($lang !== null && $id !== null && $taboo !== null) {
                     squares($image, $black, $upgrade6, 3, 64, 655, 59, 16, 16);
                     squares($image, $black, $upgrade7, 4, 64, 779, 80, 16, 16);
                     $names = load_map('raven_quill_it.tsv', $dictionaries, 'names');
-                    text($image, './Arkhamic_v2.1.ttf', 23, $black, $upgrade0, 0, 524, 223, 1, $names);
-                    text($image, './Arkhamic_v2.1.ttf', 23, $black, $upgrade4, 2, 211, 510, 1, $names);
-                    text($image, './Arkhamic_v2.1.ttf', 23, $black, $upgrade4, 2, 450, 510, 2, $names);
+                    text($image, './Arkhamic_v2.2.ttf', 23, $black, $upgrade0, 0, 524, 223, 1, $names);
+                    text($image, './Arkhamic_v2.2.ttf', 23, $black, $upgrade4, 2, 211, 510, 1, $names);
+                    text($image, './Arkhamic_v2.2.ttf', 23, $black, $upgrade4, 2, 450, 510, 2, $names);
                 } else {
                     //paint The Raven Quill https://ahlcg.derwinski.pl/EN-09042-0-MHwwfDAxMDYxLDF8MSwyfDEsM3wyLDR8MnwwNDAyOV4wMTA2MCw1fDIsNnwzLDd8NA.webp
                     //"cus_09042":"0|0|01061,1|1,2|1,3|2,4|2|04029^01060,5|2,6|3,7|4"
@@ -339,9 +339,9 @@ if ($lang !== null && $id !== null && $taboo !== null) {
                     squares($image, $black, $upgrade6, 3, 66, 653, 62, 16, 16);
                     squares($image, $black, $upgrade7, 4, 66, 755, 84, 16, 16);
                     $names = load_map('raven_quill_en.tsv', $dictionaries, 'names');
-                    text($image, './Arkhamic_v2.1.ttf', 23, $black, $upgrade0, 0, 400, 226, 1, $names);
-                    text($image, './Arkhamic_v2.1.ttf', 23, $black, $upgrade4, 2, 144, 529, 1, $names);
-                    text($image, './Arkhamic_v2.1.ttf', 23, $black, $upgrade4, 2, 417, 529, 2, $names);
+                    text($image, './Arkhamic_v2.2.ttf', 23, $black, $upgrade0, 0, 400, 226, 1, $names);
+                    text($image, './Arkhamic_v2.2.ttf', 23, $black, $upgrade4, 2, 144, 529, 1, $names);
+                    text($image, './Arkhamic_v2.2.ttf', 23, $black, $upgrade4, 2, 417, 529, 2, $names);
                 }
             } else if ($fileToLoad == '09059a.webp') {
                 if ($flang == 'IT') {

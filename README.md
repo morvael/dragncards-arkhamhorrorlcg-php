@@ -54,14 +54,23 @@ Plain file requests are redirected to the `image.php` script using the following
 ```
 AddDefaultCharset UTF-8
 RewriteEngine On
+RewriteRule ^/apple-touch-icon\.png$ apple-touch-icon.png [NC,L]
+RewriteRule ^/favicon-16x16\.png$ favicon-16x16.png [NC,L]
+RewriteRule ^/favicon-32x32\.png$ favicon-32x32.png [NC,L]
+RewriteRule ^/favicon-48x48\.png$ favicon-48x48.png [NC,L]
 RewriteRule ^/favicon\.ico$ favicon.ico [NC,L]
+RewriteRule ^/icon-192\.png$ icon-192.png [NC,L]
+RewriteRule ^/icon-512\.png$ icon-512.png [NC,L]
 RewriteRule ^/robots\.txt$ robots.txt [NC,L]
+RewriteRule ^/site\.webmanifest$ site.webmanifest [NC,L]
 RewriteRule ^/([A-Z]{2,2})-([0-9]{4,12}[a-z]?)-([0-9]{1,3})-([A-Za-z0-9-_]{0,1024})-([A-Za-z0-9-_]{0,2048})\.webp$ image.php?lang=$1&id=$2&taboo=$3&data=$4&dictionaries=$5 [NC,L]
 RewriteRule ^/([A-Z]{2,2})-([0-9]{4,12}[a-z]?)-([0-9]{1,3})-([A-Za-z0-9-_]{0,1024})\.webp$ image.php?lang=$1&id=$2&taboo=$3&data=$4 [NC,L]
 RewriteRule ^/([0-9]{4,12}[a-z]?)-([0-9]{1,3})-([A-Za-z0-9-_]{0,1024})-([A-Za-z0-9-_]{0,2048})\.webp$ image.php?lang=EN&id=$1&taboo=$2&data=$3&dictionaries=$4 [NC,L]
 RewriteRule ^/([0-9]{4,12}[a-z]?)-([0-9]{1,3})-([A-Za-z0-9-_]{0,1024})\.webp$ image.php?lang=EN&id=$1&taboo=$2&data=$3 [NC,L]
 RewriteRule ^.*$ bag.html [NC,L]
 ```
+
+Skip leading `/` if this is a `.htaccess` file.
 
 #### Repository contents
 

@@ -311,7 +311,7 @@ if ($lang !== null && $id !== null && $taboo !== null) {
                 if ($flang == 'IT') {
                     //paint The Raven Quill https://ahlcg.derwinski.pl/IT-09042-0-MHwwfDAxMDYxLDF8MSwyfDEsM3wyLDR8MnwwNDAyOV4wMTA2MCw1fDIsNnwzLDd8NA.webp
                     //"cus_09042":"0|0|01061,1|1,2|1,3|2,4|2|04029^01060,5|2,6|3,7|4"
-                    //with custom card name mapping https://ahlcg.derwinski.pl/IT-09042-0-MHwwfGlkMSwxfDEsMnwxLDN8Miw0fDJ8aWQyXmlkMyw1fDIsNnwzLDd8NA-eyJuYW1lcyI6eyJpZDEiOiJDYXJ0YSBBIiwiaWQyIjoiQ2FydGEgQiIsImlkMyI6IkNhcnRhIEMifX0.webp
+                    //with custom card name mapping https://ahlcg.derwinski.pl/IT-09042-0-MHwwfGlkMSwxfDEsMnwxLDN8Miw0fDJ8aWQyXmlkMyw1fDIsNnwzLDd8NA~eyJuYW1lcyI6eyJpZDEiOiJDYXJ0YSBBIiwiaWQyIjoiQ2FydGEgQiIsImlkMyI6IkNhcnRhIEMifX0.webp
                     //0|0|id1,1|1,2|1,3|2,4|2|id2^id3,5|2,6|3,7|4
                     //{"names":{"id1":"Carta A","id2":"Carta B","id3":"Carta C"}}
                     squares($image, $black, $upgrade1, 1, 64, 267, 16, 16, 16);
@@ -328,7 +328,7 @@ if ($lang !== null && $id !== null && $taboo !== null) {
                 } else {
                     //paint The Raven Quill https://ahlcg.derwinski.pl/EN-09042-0-MHwwfDAxMDYxLDF8MSwyfDEsM3wyLDR8MnwwNDAyOV4wMTA2MCw1fDIsNnwzLDd8NA.webp
                     //"cus_09042":"0|0|01061,1|1,2|1,3|2,4|2|04029^01060,5|2,6|3,7|4"
-                    //with custom card name mapping https://ahlcg.derwinski.pl/EN-09042-0-MHwwfGlkMSwxfDEsMnwxLDN8Miw0fDJ8aWQyXmlkMyw1fDIsNnwzLDd8NA-eyJuYW1lcyI6eyJpZDEiOiJDYXJkIEEiLCJpZDIiOiJDYXJkIEIiLCJpZDMiOiJDYXJkIEMifX0.webp
+                    //with custom card name mapping https://ahlcg.derwinski.pl/EN-09042-0-MHwwfGlkMSwxfDEsMnwxLDN8Miw0fDJ8aWQyXmlkMyw1fDIsNnwzLDd8NA~eyJuYW1lcyI6eyJpZDEiOiJDYXJkIEEiLCJpZDIiOiJDYXJkIEIiLCJpZDMiOiJDYXJkIEMifX0.webp
                     //0|0|id1,1|1,2|1,3|2,4|2|id2^id3,5|2,6|3,7|4
                     //{"names":{"id1":"Card A","id2":"Card B","id3":"Card C"}}
                     squares($image, $black, $upgrade1, 1, 66, 272, 16, 16, 16);

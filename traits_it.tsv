@@ -18,6 +18,7 @@ Artist	Artista
 Assistant	Assistente
 Attack	Attacco
 Augury	Auspicio
+Bane	Anatema
 Basement	Seminterrato
 Believer	Credente
 Blessed	Benedetto
@@ -39,6 +40,7 @@ Central	Centro
 Charm	Amuleto
 Chosen	Prescelto
 Civic	Civico
+Civilian	Civile
 Clairvoyant	Chiaroveggente
 Clothing	Vestiario
 Coastal	Costiero
@@ -136,6 +138,7 @@ Melee	Mischia
 Misfortune	Malasorte
 Monster	Mostro
 Mutated	Mutato
+Mutation	Mutazione
 Mystery	Mistero
 Nest	Nido
 Nightgaunt	Magro Notturno
@@ -194,6 +197,7 @@ Sentinel Hill	Colle Guardiano
 Serpent	Serpente
 Service	Servizio
 Servitor	Servo
+Sewer	Fogne
 Shattered	Infranto
 Silver Twilight	Crepuscolo d'Argento
 Socialite	Mondano
